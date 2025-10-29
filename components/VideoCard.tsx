@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 import { Video, Playlist } from '../types';
 import { PlayIcon, DotsVerticalIcon, PlusIcon, StarIcon } from './Icons';
@@ -21,6 +22,13 @@ const formatDuration = (seconds: number) => {
     parts.push(m.toString().padStart(2, '0'));
     parts.push(s.toString().padStart(2, '0'));
     return parts.join(':');
+};
+
+const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + ['Bytes', 'KB', 'MB', 'GB'][i];
 };
 
 const VideoCard: React.FC<VideoCardProps> = ({ video, isSelected, onSelect, playlists, onAddToPlaylist }) => {
@@ -67,13 +75,25 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isSelected, onSelect, play
             <div className="p-3">
                 <h3 className="text-sm font-semibold truncate text-white" title={video.name}>{video.name}</h3>
                 
-                 {video.rating > 0 && (
-                    <div className="flex items-center mt-1">
-                        {[...Array(5)].map((_, i) => (
-                            <StarIcon key={i} className={`w-3.5 h-3.5 ${i < video.rating ? 'text-yellow-400' : 'text-gray-600'}`} />
-                        ))}
+                <div className="mt-1 h-5 relative">
+                    {/* Rating view (default) */}
+                    <div className="absolute inset-0 flex items-center transition-opacity duration-200 group-hover:opacity-0">
+                        {video.rating > 0 && (
+                            <div className="flex items-center">
+                                {[...Array(5)].map((_, i) => (
+                                    <StarIcon key={i} className={`w-3.5 h-3.5 ${i < video.rating ? 'text-yellow-400' : 'text-gray-600'}`} />
+                                ))}
+                            </div>
+                        )}
                     </div>
-                )}
+                    {/* Metadata view (on hover) */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center">
+                        <div className="text-xs text-gray-400 flex items-center justify-between w-full">
+                            <span>{video.resolution.width}x{video.resolution.height}</span>
+                            <span>{formatBytes(video.size)}</span>
+                        </div>
+                    </div>
+                </div>
                 
                 <div className="absolute top-1 right-1">
                     <button 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Video, Playlist, Filter, LibraryFolder, SmartPlaylistId, View } from './types';
+import { Video, Playlist, Filter, LibraryFolder, SmartPlaylistId, View, SortOrder } from './types';
 import Sidebar from './components/Sidebar';
 import VideoGrid from './components/VideoGrid';
 import VideoInfoPanel from './components/VideoInfoPanel';
@@ -38,7 +38,6 @@ declare global {
 }
 
 
-type SortOrder = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' | 'duration-asc' | 'duration-desc' | 'rating-desc' | 'rating-asc';
 
 // UI Design System Classes
 const buttonClasses = {
@@ -484,6 +483,14 @@ a.click();
                     return a.rating - b.rating;
                 case 'rating-desc':
                     return b.rating - a.rating;
+                case 'size-asc':
+                    return a.size - b.size;
+                case 'size-desc':
+                    return b.size - a.size;
+                case 'resolution-asc':
+                    return (a.resolution.width * a.resolution.height) - (b.resolution.width * b.resolution.height);
+                case 'resolution-desc':
+                    return (b.resolution.width * b.resolution.height) - (a.resolution.width * a.resolution.height);
                 default:
                     return 0;
             }
@@ -675,6 +682,10 @@ a.click();
                                                 <option value="duration-asc">Duration (Shortest)</option>
                                                 <option value="rating-desc">Rating (Highest)</option>
                                                 <option value="rating-asc">Rating (Lowest)</option>
+                                                <option value="size-desc">Size (Largest)</option>
+                                                <option value="size-asc">Size (Smallest)</option>
+                                                <option value="resolution-desc">Resolution (Highest)</option>
+                                                <option value="resolution-asc">Resolution (Lowest)</option>
                                             </select>
                                         </div>
                                     )}

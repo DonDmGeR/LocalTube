@@ -1,5 +1,6 @@
 
 
+
 export interface Video {
     id: string;
     // FIX: Made handle optional as videos from file inputs or imports don't have one initially.
@@ -48,3 +49,11 @@ export type Filter =
     | { type: 'smart'; id: SmartPlaylistId };
 
 export type View = 'grid' | 'list';
+
+export type SortOrder = 
+    | 'date-desc' | 'date-asc' 
+    | 'name-asc' | 'name-desc' 
+    | 'duration-asc' | 'duration-desc' 
+    | 'rating-desc' | 'rating-asc'
+    | 'size-asc' | 'size-desc'
+    | 'resolution-asc' | 'resolution-desc';

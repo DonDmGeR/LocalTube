@@ -1,8 +1,8 @@
 import React from 'react';
 import { Video } from '../types';
 import { StarIcon, ArrowUpIcon, ArrowDownIcon } from './Icons';
+import { SortOrder } from '../types';
 
-type SortOrder = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' | 'duration-asc' | 'duration-desc' | 'rating-desc' | 'rating-asc';
 
 interface VideoListProps {
     videos: Video[];
@@ -32,7 +32,14 @@ const formatDuration = (seconds: number): string => {
     return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-type SortKey = 'name' | 'duration' | 'rating' | 'date';
+const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + ['Bytes', 'KB', 'MB', 'GB'][i];
+};
+
+type SortKey = 'name' | 'duration' | 'rating' | 'date' | 'size' | 'resolution';
 
 const SortableHeader: React.FC<{
     title: string;
@@ -79,6 +86,8 @@ const VideoList: React.FC<VideoListProps> = ({ videos, onVideoSelect, sortOrder,
                         <th className="px-4 py-3 w-28"></th>
                         <SortableHeader title="Name" sortKey="name" currentSortOrder={sortOrder} onSort={onSortOrderChange} />
                         <SortableHeader title="Duration" sortKey="duration" currentSortOrder={sortOrder} onSort={onSortOrderChange} className="w-32" />
+                        <SortableHeader title="Size" sortKey="size" currentSortOrder={sortOrder} onSort={onSortOrderChange} className="w-28" />
+                        <SortableHeader title="Resolution" sortKey="resolution" currentSortOrder={sortOrder} onSort={onSortOrderChange} className="w-32" />
                         <SortableHeader title="Rating" sortKey="rating" currentSortOrder={sortOrder} onSort={onSortOrderChange} className="w-36" />
                         <SortableHeader title="Date Added" sortKey="date" currentSortOrder={sortOrder} onSort={onSortOrderChange} className="w-40" />
                     </tr>
@@ -99,6 +108,8 @@ const VideoList: React.FC<VideoListProps> = ({ videos, onVideoSelect, sortOrder,
                                 <div className="truncate" title={video.name}>{video.name}</div>
                             </td>
                             <td className="px-4 py-2 text-sm text-gray-300 align-top">{formatDuration(video.duration)}</td>
+                            <td className="px-4 py-2 text-sm text-gray-300 align-top">{formatBytes(video.size)}</td>
+                            <td className="px-4 py-2 text-sm text-gray-300 align-top">{video.resolution.width}x{video.resolution.height}</td>
                             <td className="px-4 py-2 align-top">
                                 {video.rating > 0 ? (
                                     <div className="flex items-center">
