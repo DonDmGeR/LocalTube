@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Video, Playlist, Filter, LibraryFolder, SmartPlaylistId, View } from './types';
 import Sidebar from './components/Sidebar';
@@ -632,7 +633,7 @@ a.click();
                 <button
                     onClick={() => setIsLeftSidebarCollapsed(p => !p)}
                     title={isLeftSidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
-                    className={`w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-r-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 ${isLeftSidebarCollapsed ? '-ml-2' : ''}`}
+                    className={`w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-r-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500 transition-transform duration-300 ${isLeftSidebarCollapsed ? '-translate-x-1/2' : ''}`}
                 >
                     <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${isLeftSidebarCollapsed ? 'rotate-180' : ''}`} />
                 </button>
@@ -871,7 +872,7 @@ a.click();
                     <button
                         onClick={() => setIsRightSidebarCollapsed(p => !p)}
                         title={isRightSidebarCollapsed ? 'Show "Up Next"' : 'Hide "Up Next"'}
-                        className={`w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-l-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 ${isRightSidebarCollapsed ? 'translate-x-2' : ''}`}
+                        className={`w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-l-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500 transition-transform duration-300 ${isRightSidebarCollapsed ? 'translate-x-1/2' : ''}`}
                     >
                         <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${!isRightSidebarCollapsed ? 'rotate-180' : ''}`} />
                     </button>
