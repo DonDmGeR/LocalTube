@@ -1,0 +1,5 @@
+{
+  "name": "LocalTube 1.1",
+  "description": "A desktop-style application to manage, organize, and play a personal video collection from local files. Features include a video library, playlists, tagging, favorites, a built-in player, and powerful search/filter capabilities.",
+  "requestFramePermissions": []
+}
