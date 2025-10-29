@@ -599,7 +599,7 @@ a.click();
 
 
     return (
-        <div className="flex h-screen bg-gray-900 text-gray-200 font-sans">
+        <div className="flex h-screen bg-gray-900 text-gray-200 font-sans overflow-x-hidden">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="video/*" multiple className="hidden" />
             <input type="file" ref={importInputRef} onChange={handleImportLibrary} accept=".json" className="hidden" />
              {isDuplicateFinderOpen && (
@@ -609,7 +609,9 @@ a.click();
                     onDeleteVideos={deleteVideos}
                 />
             )}
-            <div className={`relative flex-shrink-0 transition-all duration-300 ease-in-out ${isLeftSidebarCollapsed ? 'w-0' : 'w-64'}`}>
+
+            {/* Left Sidebar */}
+            <div className={`flex-shrink-0 transition-all duration-300 ease-in-out ${isLeftSidebarCollapsed ? 'w-0' : 'w-64'}`}>
                 <Sidebar 
                     isCollapsed={isLeftSidebarCollapsed}
                     playlists={playlists} 
@@ -623,15 +625,21 @@ a.click();
                     onDeletePlaylist={deletePlaylist}
                     smartPlaylists={SMART_PLAYLISTS}
                 />
-                 <button
+            </div>
+
+            {/* Left Sidebar Toggle */}
+            <div className="flex items-center z-10">
+                <button
                     onClick={() => setIsLeftSidebarCollapsed(p => !p)}
                     title={isLeftSidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
-                    className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 z-20 w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-r-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className={`w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-r-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 ${isLeftSidebarCollapsed ? '-ml-2' : ''}`}
                 >
                     <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${isLeftSidebarCollapsed ? 'rotate-180' : ''}`} />
                 </button>
             </div>
-            <main className="flex-1 flex flex-col overflow-hidden">
+
+            {/* Main Content */}
+            <main className="flex-1 flex flex-col overflow-hidden min-w-0">
                 <div className="relative bg-gray-800 border-b border-gray-700 shadow-md flex-shrink-0">
                     <header className={`overflow-hidden transition-all duration-300 ease-in-out ${isHeaderCollapsed ? 'max-h-0' : 'max-h-40'}`}>
                         <div className="p-4 flex items-center justify-between" id="main-header-content">
@@ -742,11 +750,10 @@ a.click();
                     </button>
                 </div>
                 
-                {selectedVideo ? (
-                    // VIDEO VIEW (FLEXBOX LAYOUT)
-                    <div className="flex-1 flex gap-6 overflow-hidden p-6">
-                        {/* Center Column: Player and Info (SCROLLABLE) */}
-                        <div className="flex-1 overflow-y-auto scrollbar-hide">
+                <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+                    {selectedVideo ? (
+                        // VIDEO PLAYER VIEW
+                        <div>
                             <div className="flex items-center gap-4 mb-4">
                                 <button
                                     onClick={() => setSelectedVideoId(null)}
@@ -809,82 +816,92 @@ a.click();
                                 onCaptureThumbnail={handleCaptureThumbnailFromCurrentFrame}
                             />
                         </div>
-                        {/* Right Column: Up Next (COLLAPSIBLE & SCROLLABLE) */}
-                        <div className={`relative transition-all duration-300 ease-in-out ${isRightSidebarCollapsed ? 'w-0' : 'w-96'}`}>
-                            <button
-                                onClick={() => setIsRightSidebarCollapsed(p => !p)}
-                                title={isRightSidebarCollapsed ? 'Show "Up Next"' : 'Hide "Up Next"'}
-                                className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 z-10 w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-l-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500"
-                            >
-                                <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${!isRightSidebarCollapsed ? 'rotate-180' : ''}`} />
-                            </button>
-                             <div className={`h-full flex flex-col overflow-hidden transition-opacity duration-300 ${isRightSidebarCollapsed ? 'opacity-0' : 'opacity-100'}`}>
-                                <h3 className="text-xl font-semibold mb-4 sticky top-0 bg-gray-900 py-2 flex-shrink-0">Up Next</h3>
-                                <div className="overflow-y-auto space-y-4 scrollbar-hide">
-                                    {filteredVideos
-                                        .filter(v => v.id !== selectedVideo.id)
-                                        .map(video => (
-                                            <VideoCard
-                                                key={video.id}
-                                                video={video}
-                                                isSelected={false}
-                                                onSelect={setSelectedVideoId}
-                                                playlists={playlists}
-                                                onAddToPlaylist={addVideoToPlaylist}
-                                            />
-                                        ))
-                                    }
+                    ) : (
+                        // LIBRARY VIEW
+                        <>
+                            {isLoading ? (
+                                <div className="flex justify-center items-center h-full">
+                                    <div className="text-xl">{loadingMessage}</div>
                                 </div>
-                            </div>
+                            ) : videos.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center h-full text-center text-gray-400">
+                                    <h2 className="text-2xl font-semibold mb-2">Your Video Library is Empty</h2>
+                                    <p className="mb-4">Click "Add Library" or "Add Videos" to get started.</p>
+                                    <div className="flex items-center gap-4">
+                                        <button 
+                                            onClick={handleAddLibraryFolder}
+                                            className={`${buttonClasses.base} ${buttonClasses.success} !px-6 !py-3 !text-lg`}
+                                        >
+                                            <FolderIcon className="w-6 h-6 mr-2" />
+                                            Add Library
+                                        </button>
+                                        <button 
+                                            onClick={handleAddFilesClick}
+                                            className={`${buttonClasses.base} ${buttonClasses.primary} !px-6 !py-3 !text-lg`}
+                                        >
+                                            <PlusIcon className="w-6 h-6 mr-2" />
+                                            Add Videos
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : viewMode === 'grid' ? (
+                                <VideoGrid 
+                                    videos={filteredVideos}
+                                    onVideoSelect={setSelectedVideoId}
+                                    selectedVideoId={selectedVideoId}
+                                    addVideoToPlaylist={addVideoToPlaylist}
+                                    playlists={playlists}
+                                />
+                            ) : (
+                                <VideoList
+                                    videos={filteredVideos}
+                                    onVideoSelect={setSelectedVideoId}
+                                    sortOrder={sortOrder}
+                                    onSortOrderChange={setSortOrder}
+                                />
+                            )}
+                        </>
+                    )}
+                </div>
+            </main>
+
+            {/* Right Sidebar Toggle */}
+            {selectedVideo && (
+                 <div className="flex items-center z-10">
+                    <button
+                        onClick={() => setIsRightSidebarCollapsed(p => !p)}
+                        title={isRightSidebarCollapsed ? 'Show "Up Next"' : 'Hide "Up Next"'}
+                        className={`w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-l-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 ${isRightSidebarCollapsed ? 'translate-x-2' : ''}`}
+                    >
+                        <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${!isRightSidebarCollapsed ? 'rotate-180' : ''}`} />
+                    </button>
+                </div>
+            )}
+           
+            {/* Right "Up Next" Sidebar */}
+            {selectedVideo && (
+                 <aside className={`flex-shrink-0 bg-gray-800 border-gray-700 shadow-lg transition-all duration-300 ease-in-out ${isRightSidebarCollapsed ? 'w-0' : 'w-64 border-l'}`}>
+                     <div className={`h-full flex flex-col overflow-hidden transition-opacity duration-200 p-4 ${isRightSidebarCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+                        <h3 className="text-xl font-semibold mb-4 flex-shrink-0">Up Next</h3>
+                        <div className="overflow-y-auto space-y-4 scrollbar-hide">
+                            {filteredVideos
+                                .filter(v => v.id !== selectedVideo.id)
+                                .map(video => (
+                                    <VideoCard
+                                        key={video.id}
+                                        video={video}
+                                        isSelected={false}
+                                        onSelect={setSelectedVideoId}
+                                        playlists={playlists}
+                                        onAddToPlaylist={addVideoToPlaylist}
+                                    />
+                                ))
+                            }
                         </div>
                     </div>
-                ) : (
-                    // GRID VIEW / LIST VIEW / LOADING / EMPTY STATE
-                    <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
-                        {isLoading ? (
-                            <div className="flex justify-center items-center h-full">
-                                <div className="text-xl">{loadingMessage}</div>
-                            </div>
-                        ) : videos.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-full text-center text-gray-400">
-                                 <h2 className="text-2xl font-semibold mb-2">Your Video Library is Empty</h2>
-                                 <p className="mb-4">Click "Add Library" or "Add Videos" to get started.</p>
-                                 <div className="flex items-center gap-4">
-                                    <button 
-                                        onClick={handleAddLibraryFolder}
-                                        className={`${buttonClasses.base} ${buttonClasses.success} !px-6 !py-3 !text-lg`}
-                                    >
-                                        <FolderIcon className="w-6 h-6 mr-2" />
-                                        Add Library
-                                    </button>
-                                     <button 
-                                        onClick={handleAddFilesClick}
-                                        className={`${buttonClasses.base} ${buttonClasses.primary} !px-6 !py-3 !text-lg`}
-                                    >
-                                        <PlusIcon className="w-6 h-6 mr-2" />
-                                        Add Videos
-                                    </button>
-                                </div>
-                            </div>
-                        ) : viewMode === 'grid' ? (
-                            <VideoGrid 
-                                videos={filteredVideos}
-                                onVideoSelect={setSelectedVideoId}
-                                selectedVideoId={selectedVideoId}
-                                addVideoToPlaylist={addVideoToPlaylist}
-                                playlists={playlists}
-                            />
-                        ) : (
-                             <VideoList
-                                videos={filteredVideos}
-                                onVideoSelect={setSelectedVideoId}
-                                sortOrder={sortOrder}
-                                onSortOrderChange={setSortOrder}
-                            />
-                        )}
-                    </div>
-                )}
-            </main>
+                </aside>
+            )}
+
         </div>
     );
 };
