@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Video, Playlist, Filter, LibraryFolder, SmartPlaylistId, View } from './types';
 import Sidebar from './components/Sidebar';
@@ -598,6 +595,12 @@ a.click();
 
     }, [videos, updateVideo]);
 
+    const upNextVideos = useMemo(() => {
+        // Exclude the currently playing video from the "Up Next" list.
+        // If no video is playing, show the full filtered list.
+        return filteredVideos.filter(v => v.id !== selectedVideo?.id);
+    }, [filteredVideos, selectedVideo]);
+
 
     return (
         <div className="flex h-screen bg-gray-900 text-gray-200 font-sans overflow-x-hidden">
@@ -867,41 +870,34 @@ a.click();
             </main>
 
             {/* Right Sidebar Toggle */}
-            {selectedVideo && (
-                 <div className="flex items-center z-10">
-                    <button
-                        onClick={() => setIsRightSidebarCollapsed(p => !p)}
-                        title={isRightSidebarCollapsed ? 'Show "Up Next"' : 'Hide "Up Next"'}
-                        className={`w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-l-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500 transition-transform duration-300 ${isRightSidebarCollapsed ? 'translate-x-1/2' : ''}`}
-                    >
-                        <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${!isRightSidebarCollapsed ? 'rotate-180' : ''}`} />
-                    </button>
-                </div>
-            )}
+            <div className="flex items-center z-10">
+                <button
+                    onClick={() => setIsRightSidebarCollapsed(p => !p)}
+                    title={isRightSidebarCollapsed ? 'Show "Up Next"' : 'Hide "Up Next"'}
+                    className={`w-4 h-12 bg-gray-700 hover:bg-gray-600 rounded-l-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500 transition-transform duration-300 ${isRightSidebarCollapsed ? 'translate-x-1/2' : ''}`}
+                >
+                    <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${!isRightSidebarCollapsed ? 'rotate-180' : ''}`} />
+                </button>
+            </div>
            
             {/* Right "Up Next" Sidebar */}
-            {selectedVideo && (
-                 <aside className={`flex-shrink-0 bg-gray-800 border-gray-700 shadow-lg transition-all duration-300 ease-in-out ${isRightSidebarCollapsed ? 'w-0' : 'w-64 border-l'}`}>
-                     <div className={`h-full flex flex-col overflow-hidden transition-opacity duration-200 p-4 ${isRightSidebarCollapsed ? 'opacity-0' : 'opacity-100'}`}>
-                        <h3 className="text-xl font-semibold mb-4 flex-shrink-0">Up Next</h3>
-                        <div className="overflow-y-auto space-y-4 scrollbar-hide">
-                            {filteredVideos
-                                .filter(v => v.id !== selectedVideo.id)
-                                .map(video => (
-                                    <VideoCard
-                                        key={video.id}
-                                        video={video}
-                                        isSelected={false}
-                                        onSelect={setSelectedVideoId}
-                                        playlists={playlists}
-                                        onAddToPlaylist={addVideoToPlaylist}
-                                    />
-                                ))
-                            }
-                        </div>
+            <aside className={`flex-shrink-0 bg-gray-800 border-gray-700 shadow-lg transition-all duration-300 ease-in-out ${isRightSidebarCollapsed ? 'w-0' : 'w-64 border-l'}`}>
+                 <div className={`h-full flex flex-col overflow-hidden transition-opacity duration-200 p-4 ${isRightSidebarCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+                    <h3 className="text-xl font-semibold mb-4 flex-shrink-0">Up Next</h3>
+                    <div className="overflow-y-auto space-y-4 scrollbar-hide">
+                        {upNextVideos.map(video => (
+                            <VideoCard
+                                key={video.id}
+                                video={video}
+                                isSelected={false}
+                                onSelect={setSelectedVideoId}
+                                playlists={playlists}
+                                onAddToPlaylist={addVideoToPlaylist}
+                            />
+                        ))}
                     </div>
-                </aside>
-            )}
+                </div>
+            </aside>
 
         </div>
     );
